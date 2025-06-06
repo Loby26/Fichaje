@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Panel de control{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.18/dist/full.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-base-200 min-h-screen">
+
+    <div class="flex min-h-screen">
+        <!-- Menú lateral -->
+        <aside class="w-64 bg-base-200 p-4">
+            <h2 class="text-xl font-bold mb-4">Navegación</h2>
+            <ul class="menu">
+
+                <!-- Todos ven: Inicio -->
+                <li>
+                    <a href="{{ url_for('main.index') }}">
+                        <i data-lucide="home" class="w-5 h-5 mr-2"></i>
+                        Inicio
+                    </a>
+                </li>
+
+                <!-- Si es administrador: muestra todas las opciones -->
+                {% if current_user.rol == 'administrador' %}
+                    <li>
+                        <a href="{{ url_for('main.empleados') }}">
+                            <i data-lucide="users" class="w-5 h-5 mr-2"></i>
+                            Empleados
+                        </a>
+                    </li>
+                {% endif %}
+
+                <!-- Todos ven: Jornadas -->
+                <li>
+                    <a href="{{ url_for('main.jornadas') }}">
+                        <i data-lucide="clock" class="w-5 h-5 mr-2"></i>
+                        Jornadas
+                    </a>
+                </li>
+                
+                {% if current_user.rol == 'administrador' %}
+                    <li>
+                        <a href="{{ url_for('main.panel_validaciones') }}">
+                            <i data-lucide="check-circle" class="w-5 h-5 mr-2"></i>
+                            Panel Jornadas
+                        </a>
+                    </li>
+                {% endif %}
+
+                <!-- Todos ven: Ausencias -->
+                <li>
+                    <a href="{{ url_for('main.ausencias') }}">
+                        <i data-lucide="calendar" class="w-5 h-5 mr-2"></i>
+                        Ausencias
+                    </a>
+                </li>
+
+                <!-- Todos ven: Calendario de Ausencias -->
+                <li>
+                    <a href="{{ url_for('main.calendario_ausencias') }}">
+                        <i data-lucide="calendar-days" class="w-5 h-5 mr-2"></i>
+                        Calendario Ausencias
+                    </a>
+                </li>
+
+            </ul>
+        </aside>
+
+
+        <!-- Contenido principal -->
+        <div class="flex-1 flex flex-col">
+            <!-- Barra superior -->
+            <div class="navbar bg-base-100 shadow-sm px-4">
+                <!-- Título -->
+                <div class="flex-1">
+                    <h1 class="text-2xl font-bold">{% block header_title %}Resumen general{% endblock %}</h1>
+                </div>
+
+                <!-- Usuario logueado (derecha) -->
+                <div class="flex items-center gap-3 ml-auto">
+                    <!-- Avatar con iniciales -->
+                    <div
+                        class="w-8 h-8 rounded-full bg-green-200 text-green-800 flex items-center justify-center font-bold text-sm">
+                        {{ current_user.nombre.split(' ')[0][0] }}{{ current_user.nombre.split(' ')[1][0] if
+                        current_user.nombre.split(' ')|length > 1 else '' }}
+                    </div>
+                    <!-- Nombre completo -->
+                    <div class="text-sm font-medium text-gray-200">
+                        {{ current_user.nombre }}
+                    </div>
+                    <!-- Dropdown -->
+                    <div class="dropdown dropdown-end">
+                        <label tabindex="0" class="btn btn-ghost btn-circle">
+                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                            </svg>
+                        </label>
+                        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-200 rounded-box w-52"
+                            style="z-index: 10;">
+                            <li><a href="#">Mi perfil</a></li>
+                            <li><a href="{{ url_for('auth.logout') }}">Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contenido dinámico -->
+            <main class="p-6 flex-1">
+                <!-- Mensajes flash -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="mb-4">
+                    {% for category, message in messages %}
+                    <div class="alert alert-{{ 'success' if category == 'success' else 'error' }} shadow-lg">
+                        <div>
+                            <span>{{ message }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <!-- Aquí va el contenido de cada página -->
+                {% block content %}{% endblock %}
+            </main>
+        </div>
+    </div>
+
+    <!-- Cargar los iconos de lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+    <!-- Cargar los iconos de lucide -->
+    <script>
+        lucide.createIcons();
+    </script>
+
+    <!-- Auto-hide flash messages -->
+    <script>
+        setTimeout(() => {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.classList.add('opacity-0', 'transition-opacity', 'duration-500');
+                setTimeout(() => alert.remove(), 500);  // Elimina el elemento tras la animación
+            });
+        }, 3000);  // 3 segundos
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Empleados{% endblock %}
+
+{% block header_title %}Gestión de empleados{% endblock %}
+
+{% block content %}
+
+<!-- Botón para abrir modal -->
+<div class="flex justify-between mb-4">
+    <h2 class="text-xl font-bold">Listado de empleados</h2>
+    <button onclick="document.getElementById('modal-empleado').showModal()" class="btn btn-primary">Nuevo empleado</button>
+</div>
+
+<!-- Tabla de empleados -->
+<div class="overflow-x-auto bg-base-100 rounded shadow">
+    <table class="table table-zebra">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Rol</th>
+                <th>Fecha de registro</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for empleado in empleados %}
+            <tr>
+                <td>{{ empleado.id }}</td>
+                <td>{{ empleado.nombre }}</td>
+                <td>{{ empleado.email }}</td>
+                <td>
+                    {% if empleado.rol == 'administrador' %}
+                        <span class="badge badge-error">{{ empleado.rol }}</span>
+                    {% else %}
+                        <span class="badge badge-info">{{ empleado.rol }}</span>
+                    {% endif %}
+                </td>
+                <td>{{ empleado.fecha_registro.strftime('%Y-%m-%d %H:%M') if empleado.fecha_registro else '-' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="5" class="text-center text-gray-500">No hay empleados registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal de nuevo empleado -->
+<dialog id="modal-empleado" class="modal">
+    <form method="POST" action="{{ url_for('main.empleados') }}" class="modal-box space-y-4">
+        <h3 class="font-bold text-lg">Nuevo empleado</h3>
+
+        <div>
+            <label class="label">Nombre</label>
+            <input type="text" name="nombre" class="input input-bordered w-full" required>
+        </div>
+
+        <div>
+            <label class="label">Email</label>
+            <input type="email" name="email" class="input input-bordered w-full" required>
+        </div>
+
+        <div>
+            <label class="label">Contraseña</label>
+            <input type="password" name="contrasena" class="input input-bordered w-full" required>
+        </div>
+
+        <div>
+            <label class="label">Rol</label>
+            <select name="rol" class="select select-bordered w-full">
+                <option value="empleado" selected>Empleado</option>
+                <option value="administrador">Administrador</option>
+            </select>
+        </div>
+
+        <!-- Botones -->
+        <div class="modal-action">
+            <button type="button" class="btn" onclick="document.getElementById('modal-empleado').close()">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Crear</button>
+        </div>
+    </form>
+</dialog>
+
+{% endblock %}

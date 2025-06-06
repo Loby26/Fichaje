@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Calendario de Ausencias{% endblock %}
+
+{% block header_title %}Calendario de Ausencias{% endblock %}
+
+{% block content %}
+
+<!-- Botón volver -->
+<a href="{{ url_for('main.ausencias') }}" class="text-sm text-blue-400 hover:underline mb-4 inline-block">&larr; Volver a lista</a>
+
+<!-- Controles de navegación -->
+<div class="flex justify-between items-center mb-4">
+    <!-- Mes anterior -->
+    <a href="{{ url_for('main.calendario_ausencias', year=year if month > 1 else year-1, month=month-1 if month > 1 else 12) }}"
+       class="btn btn-sm">← Mes anterior</a>
+
+    <!-- Título del mes -->
+    <h2 class="text-xl font-bold">
+        {{ month | month_name }} {{ year }}
+    </h2>
+
+    <!-- Mes siguiente -->
+    <a href="{{ url_for('main.calendario_ausencias', year=year if month < 12 else year+1, month=month+1 if month < 12 else 1) }}"
+       class="btn btn-sm">Mes siguiente →</a>
+</div>
+
+<!-- Calendario en CSS Grid -->
+<div class="grid grid-cols-7 gap-2 bg-base-100 p-4 rounded shadow mt-4">
+    <!-- Cabecera de días -->
+    {% for dia in ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'] %}
+        <div class="text-center font-bold text-sm">{{ dia }}</div>
+    {% endfor %}
+
+    <!-- Celdas del mes -->
+    {% for day in range(1, calendario|length + 1) %}
+        <div class="border p-2 rounded min-h-[100px] relative">
+            <div class="absolute top-1 left-1 text-xs text-gray-400">{{ day }}</div>
+
+            {% for ausencia in calendario[day] %}
+                <div class="mt-4 text-xs bg-red-100 text-red-700 px-2 py-1 rounded mb-1">
+                    {{ ausencia.nombre }} <br>
+                    <span class="text-gray-500 italic text-[10px]">{{ ausencia.motivo }}</span>
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

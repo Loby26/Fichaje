@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Panel de Validaciones{% endblock %}
+
+{% block header_title %}Panel de Aprobación de Jornadas y Ausencias{% endblock %}
+
+{% block content %}
+
+<!-- Jornadas pendientes -->
+<h2 class="text-xl font-bold mb-4">Jornadas pendientes</h2>
+
+{% if jornadas %}
+    <div class="overflow-x-auto mb-8">
+        <table class="table table-zebra w-full">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Empleado</th>
+                    <th>Fecha</th>
+                    <th>Horas</th>
+                    <th>Comentario</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for jornada in jornadas %}
+                <tr>
+                    <td>{{ jornada.id }}</td>
+                    <td>{{ jornada.empleado.nombre }}</td>
+                    <td>{{ jornada.fecha.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ jornada.horas_trabajadas }}</td>
+                    <td>{{ jornada.comentario or '-' }}</td>
+                    <td>
+                        <form method="POST" class="flex space-x-2">
+                            <input type="hidden" name="tipo" value="jornada">
+                            <input type="hidden" name="jornada_id" value="{{ jornada.id }}">
+                            <button type="submit" name="accion" value="aceptar" class="btn btn-success btn-sm">Aceptar</button>
+                            <button type="submit" name="accion" value="rechazar" class="btn btn-error btn-sm">Rechazar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p class="text-center text-gray-500 mb-8">No hay jornadas pendientes.</p>
+{% endif %}
+
+<!-- Ausencias pendientes -->
+<h2 class="text-xl font-bold mb-4">Ausencias pendientes</h2>
+
+{% if ausencias %}
+    <div class="overflow-x-auto">
+        <table class="table table-zebra w-full">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Empleado</th>
+                    <th>Fecha inicio</th>
+                    <th>Fecha fin</th>
+                    <th>Motivo</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ausencia in ausencias %}
+                <tr>
+                    <td>{{ ausencia.id }}</td>
+                    <td>{{ ausencia.empleado.nombre }}</td>
+                    <td>{{ ausencia.fecha_inicio.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ ausencia.fecha_fin.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ ausencia.motivo or '-' }}</td>
+                    <td>
+                        <form method="POST" class="flex space-x-2">
+                            <input type="hidden" name="tipo" value="ausencia">
+                            <input type="hidden" name="ausencia_id" value="{{ ausencia.id }}">
+                            <button type="submit" name="accion" value="aceptar" class="btn btn-success btn-sm">Aceptar</button>
+                            <button type="submit" name="accion" value="rechazar" class="btn btn-error btn-sm">Rechazar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <p class="text-center text-gray-500">No hay ausencias pendientes.</p>
+{% endif %}
+
+{% endblock %}

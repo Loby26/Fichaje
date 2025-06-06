@@ -1,0 +1,194 @@
+{% extends 'base.html' %}
+
+{% block title %}Resumen general{% endblock %}
+
+{% block header_title %}Resumen general{% endblock %}
+
+{% block content %}
+
+{% if current_user.rol == 'administrador' %}
+    <!-- PANEL PARA ADMINISTRADOR -->
+
+ <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+
+    <!-- Total empleados -->
+    <div class="card bg-base-100 shadow">
+        <div class="card-body">
+            <h2 class="card-title text-indigo-600">
+                <i data-lucide="users" class="w-6 h-6"></i>
+                Empleados
+            </h2>
+            <p class="text-4xl font-bold">{{ total_empleados }}</p>
+        </div>
+    </div>
+
+    <!-- Jornadas hoy -->
+    <div class="card bg-base-100 shadow">
+        <div class="card-body">
+            <h2 class="card-title text-green-600">
+                <i data-lucide="calendar-check" class="w-6 h-6"></i>
+                Jornadas hoy
+            </h2>
+            <p class="text-4xl font-bold">{{ jornadas_hoy }}</p>
+        </div>
+    </div>
+
+    <!-- Total jornadas -->
+    <div class="card bg-base-100 shadow">
+        <div class="card-body">
+            <h2 class="card-title text-blue-600">
+                <i data-lucide="clock" class="w-6 h-6"></i>
+                Total jornadas
+            </h2>
+            <p class="text-4xl font-bold">{{ total_jornadas }}</p>
+        </div>
+    </div>
+
+    <!-- Ausencias activas -->
+    <div class="card bg-base-100 shadow">
+        <div class="card-body">
+            <h2 class="card-title text-red-600">
+                <i data-lucide="briefcase" class="w-6 h-6"></i>
+                Ausencias activas
+            </h2>
+            <p class="text-4xl font-bold">{{ ausencias_activas }}</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Últimos empleados -->
+<div class="card bg-base-100 shadow mb-6">
+    <div class="card-body">
+        <h2 class="card-title text-indigo-600 mb-4">
+            <i data-lucide="user-plus" class="w-6 h-6"></i>
+            Últimos empleados
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="table w-full">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Email</th>
+                        <th>Rol</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empleado in ultimos_empleados %}
+                    <tr>
+                        <td>{{ empleado.nombre }}</td>
+                        <td>{{ empleado.email }}</td>
+                        <td>{{ empleado.rol }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="3">No hay empleados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Últimas jornadas -->
+<div class="card bg-base-100 shadow mb-6">
+    <div class="card-body">
+        <h2 class="card-title text-green-600 mb-4">
+            <i data-lucide="calendar-days" class="w-6 h-6"></i>
+            Últimas jornadas
+        </h2>
+        <div class="overflow-x-auto">
+            <table class="table w-full">
+                <thead>
+                    <tr>
+                        <th>Empleado</th>
+                        <th>Fecha</th>
+                        <th>Horas trabajadas</th>
+                        <th>Comentario</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for jornada in ultimas_jornadas %}
+                    <tr>
+                        <td>{{ jornada.empleado.nombre }}</td>
+                        <td>{{ jornada.fecha.strftime('%d/%m/%Y') }}</td>
+                        <td>{{ jornada.horas_trabajadas }}</td>
+                        <td>{{ jornada.comentario }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4">No hay jornadas registradas.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+{% else %}
+   <!-- PANEL SIMPLIFICADO PARA EMPLEADO -->
+
+    <div class="bg-base-100 p-6 rounded shadow mb-6">
+
+        <!-- Header Bienvenida -->
+        <div class="flex items-center mb-6">
+            <div class="w-16 h-16 rounded-full bg-green-200 text-green-800 flex items-center justify-center text-2xl font-bold mr-4">
+                {{ current_user.nombre[0] }}
+            </div>
+            <div>
+                <h3 class="text-2xl font-bold">¡Hola {{ current_user.nombre }}!</h3>
+                <p class="text-sm text-gray-400">Panel de empleado</p>
+            </div>
+        </div>
+
+        <!-- Información personal -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div class="bg-base-200 p-4 rounded shadow">
+                <h4 class="font-semibold mb-2 text-blue-400">Información personal</h4>
+                <p class="mb-1"><strong>Nombre:</strong> {{ current_user.nombre }}</p>
+                <p class="mb-1"><strong>Email:</strong> {{ current_user.email }}</p>
+                <p><strong>Rol:</strong> {{ current_user.rol | capitalize }}</p>
+            </div>
+
+            <!-- Última jornada -->
+            <div class="bg-base-200 p-4 rounded shadow">
+                <h4 class="font-semibold mb-2 text-blue-400">Última jornada</h4>
+                {% if ultima_jornada %}
+                    <p class="mb-1"><strong>Fecha:</strong> {{ ultima_jornada.fecha }}</p>
+                    <p class="mb-1"><strong>Horas trabajadas:</strong> {{ ultima_jornada.horas_trabajadas }}</p>
+                    <p><strong>Comentario:</strong> {{ ultima_jornada.comentario or 'Sin comentarios' }}</p>
+                {% else %}
+                    <p class="text-gray-400">No tienes jornadas registradas.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Próximas ausencias -->
+        <div class="bg-base-200 p-4 rounded shadow">
+            <h4 class="font-semibold mb-4 text-blue-400">Tus próximas ausencias</h4>
+
+            {% if proximas_ausencias %}
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {% for a in proximas_ausencias %}
+                    <div class="border border-blue-300 p-3 rounded bg-base-100">
+                        <p class="text-blue-500 font-bold mb-1">{{ a.motivo }}</p>
+                        <p class="text-sm mb-1"><strong>Desde:</strong> {{ a.fecha_inicio }}</p>
+                        <p class="text-sm"><strong>Hasta:</strong> {{ a.fecha_fin }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-gray-400">No tienes ausencias programadas.</p>
+            {% endif %}
+        </div>
+
+    </div>
+
+
+{% endif %}
+
+{% endblock %}

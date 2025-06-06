@@ -1,0 +1,26 @@
+{% extends 'base_auth.html' %}
+
+{% block title %}Registro{% endblock %}
+
+{% block header_title %}Registro de usuario{% endblock %}
+
+{% block content %}
+<form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4">
+    <div>
+        <label class="label">Nombre completo</label>
+        <input type="text" name="nombre" class="input input-bordered w-full" required>
+    </div>
+    <div>
+        <label class="label">Correo electrónico</label>
+        <input type="email" name="email" class="input input-bordered w-full" required>
+    </div>
+    <div>
+        <label class="label">Contraseña</label>
+        <input type="password" name="contrasena" class="input input-bordered w-full" required>
+    </div>
+    <button type="submit" class="btn btn-primary w-full">Registrar</button>
+</form>
+<p class="mt-4 text-center text-sm">
+    ¿Ya tienes cuenta? <a href="{{ url_for('auth.login') }}" class="link link-primary">Inicia sesión</a>
+</p>
+{% endblock %}

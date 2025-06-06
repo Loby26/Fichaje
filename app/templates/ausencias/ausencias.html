@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block title %}Gestión de Ausencias{% endblock %}
+
+{% block header_title %}Ausencias{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-6">
+    <h2 class="text-xl font-bold">Lista de Ausencias</h2>
+    <button class="btn btn-primary" onclick="document.getElementById('modal_ausencia').showModal()">Nueva Ausencia</button>
+</div>
+
+<div class="overflow-x-auto">
+    <table class="table w-full">
+        <thead>
+            <tr>
+                <th>Empleado</th>
+                <th>Fecha inicio</th>
+                <th>Fecha fin</th>
+                <th>Motivo</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ausencia in ausencias %}
+            <tr>
+                <td>{{ ausencia.empleado.nombre }}</td>
+                <td>{{ ausencia.fecha_inicio.strftime('%d/%m/%Y') }}</td>
+                <td>{{ ausencia.fecha_fin.strftime('%d/%m/%Y') }}</td>
+                <td>{{ ausencia.motivo }}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="4" class="text-center">No hay ausencias registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal de Nueva Ausencia -->
+<dialog id="modal_ausencia" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Registrar Ausencia</h3>
+        <form action="{{ url_for('main.ausencias') }}" method="POST" class="space-y-4">
+
+            <!-- Campo Empleado -->
+            <div>
+                <label class="block text-sm mb-1">Empleado</label>
+
+                {% if current_user.rol == 'administrador' %}
+                <select name="empleado_id" class="select select-bordered w-full" required>
+                    <option value="" disabled selected>Selecciona un empleado</option>
+                    {% for empleado in empleados %}
+                    <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+                    {% endfor %}
+                </select>
+                {% else %}
+                <!-- Si es empleado normal, ocultamos el campo con su propio ID -->
+                <input type="hidden" name="empleado_id" value="{{ current_user.id }}">
+                <p class="text-gray-400 text-sm">{{ current_user.nombre }}</p>
+                {% endif %}
+            </div>
+
+            <!-- Campo Fecha Inicio -->
+            <div>
+                <label class="block text-sm mb-1">Fecha Inicio</label>
+                <input type="date" name="fecha_inicio" class="input input-bordered w-full" required>
+            </div>
+
+            <!-- Campo Fecha Fin -->
+            <div>
+                <label class="block text-sm mb-1">Fecha Fin</label>
+                <input type="date" name="fecha_fin" class="input input-bordered w-full" required>
+            </div>
+
+            <!-- Nuevo campo: Tipo de ausencia -->
+            <div>
+                <label class="block text-sm mb-1">Tipo de ausencia</label>
+                <select name="tipo" class="select select-bordered w-full" required>
+                    <option value="vacaciones">Vacaciones</option>
+                    <option value="enfermedad">Enfermedad</option>
+                    <option value="permiso personal">Permiso personal</option>
+                    <option value="maternidad/paternidad">Maternidad / Paternidad</option>
+                    <option value="otro" selected>Otro</option>
+                </select>
+            </div>
+
+            <!-- Campo Motivo -->
+            <div>
+                <label class="block text-sm mb-1">Motivo</label>
+                <input type="text" name="motivo" class="input input-bordered w-full">
+            </div>
+
+            <!-- Botones -->
+            <div class="modal-action flex justify-end gap-2">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn" onclick="document.getElementById('modal_ausencia').close()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+{% endblock %}

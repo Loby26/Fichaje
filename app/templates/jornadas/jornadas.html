@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}Jornadas{% endblock %}
+
+{% block header_title %}Gestión de Jornadas{% endblock %}
+
+{% block content %}
+
+<div class="flex justify-between mb-4">
+    <h2 class="text-xl font-semibold">Listado de jornadas</h2>
+    <button class="btn btn-primary" onclick="document.getElementById('modal-nueva-jornada').showModal()">
+        <i data-lucide="plus" class="w-5 h-5 mr-2"></i>
+        Nueva jornada
+    </button>
+</div>
+
+<!-- Tabla de jornadas -->
+<div class="overflow-x-auto">
+    <table class="table table-zebra w-full">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Empleado</th>
+                <th>Fecha</th>
+                <th>Horas trabajadas</th>
+                <th>Comentario</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for jornada in jornadas %}
+            <tr>
+                <td>{{ jornada.id }}</td>
+                <td>{{ jornada.empleado.nombre }}</td>
+                <td>{{ jornada.fecha }}</td>
+                <td>{{ jornada.horas_trabajadas | round(2) }}</td>
+                <td>{{ jornada.comentario }}</td>
+                <td>
+                    {% if jornada.estado == 'pendiente' %}
+                        <span class="badge badge-warning">Pendiente</span>
+                    {% elif jornada.estado == 'aprobada' %}
+                        <span class="badge badge-success">Aprobada</span>
+                    {% else %}
+                        <span class="badge">-</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="6" class="text-center text-gray-500 py-4">No hay jornadas registradas.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modal: Nueva jornada -->
+<dialog id="modal-nueva-jornada" class="modal">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg mb-4">Nueva jornada</h3>
+        <form action="{{ url_for('main.jornadas') }}" method="POST" class="space-y-4">
+
+            {% if current_user.rol == 'administrador' %}
+            <!-- Solo los administradores pueden elegir empleado -->
+            <div>
+                <label class="label">
+                    <span class="label-text">Empleado</span>
+                </label>
+                <select name="empleado_id" class="select select-bordered w-full" required>
+                    {% for empleado in empleados %}
+                    <option value="{{ empleado.id }}">{{ empleado.nombre }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% else %}
+            <!-- Empleado normal: campo hidden con su propio ID -->
+            <input type="hidden" name="empleado_id" value="{{ current_user.id }}">
+            {% endif %}
+
+            <div>
+                <label class="label">
+                    <span class="label-text">Fecha</span>
+                </label>
+                <input type="date" name="fecha" class="input input-bordered w-full" required>
+            </div>
+
+            <div>
+                <label class="label">
+                    <span class="label-text">Horas trabajadas</span>
+                </label>
+                <div class="flex gap-2">
+                    <input type="number" name="horas" min="0" class="input input-bordered w-1/2" placeholder="Horas" required>
+                    <input type="number" name="minutos" min="0" max="59" class="input input-bordered w-1/2" placeholder="Minutos" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="label">
+                    <span class="label-text">Comentario</span>
+                </label>
+                <textarea name="comentario" class="textarea textarea-bordered w-full"></textarea>
+            </div>
+
+            <div class="modal-action">
+                <button type="submit" class="btn btn-primary">Guardar</button>
+                <button type="button" class="btn" onclick="document.getElementById('modal-nueva-jornada').close()">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+{% endblock %}

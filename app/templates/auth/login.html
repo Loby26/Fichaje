@@ -1,0 +1,26 @@
+{% extends 'base_auth.html' %}
+
+{% block title %}Iniciar sesión{% endblock %}
+
+{% block header_title %}Iniciar sesión{% endblock %}
+
+{% block content %}
+<form action="{{ url_for('auth.login') }}" method="POST" class="space-y-4">
+    <div>
+        <label class="block text-sm mb-1 text-gray-300">Email</label>
+        <input type="email" name="email" class="input input-bordered w-full bg-base-200 text-white" required>
+    </div>
+
+    <div>
+        <label class="block text-sm mb-1 text-gray-300">Contraseña</label>
+        <input type="password" name="contrasena" class="input input-bordered w-full bg-base-200 text-white" required>
+    </div>
+
+    <button type="submit" class="btn btn-primary w-full">Iniciar sesión</button>
+</form>
+
+<p class="mt-4 text-center text-sm text-gray-400">
+    ¿No tienes cuenta? 
+    <a href="{{ url_for('auth.register') }}" class="text-blue-400 hover:underline">Registrarse</a>
+</p>
+{% endblock %}
